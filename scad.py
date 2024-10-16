@@ -14,8 +14,8 @@ def make_scad(**kwargs):
         filter = ""
         #filter = "test"
 
-        kwargs["save_type"] = "none"
-        #kwargs["save_type"] = "all"
+        #kwargs["save_type"] = "none"
+        kwargs["save_type"] = "all"
         
         kwargs["overwrite"] = True
         
@@ -26,9 +26,9 @@ def make_scad(**kwargs):
     # default variables
     if True:
         kwargs["size"] = "oobb"
-        kwargs["width"] = 1
-        kwargs["height"] = 1
-        kwargs["thickness"] = 3
+        kwargs["width"] = 3
+        kwargs["height"] = 3
+        kwargs["thickness"] = 14
         
     # project_variables
     if True:
@@ -38,7 +38,7 @@ def make_scad(**kwargs):
     if True:
 
         part_default = {} 
-        part_default["project_name"] = "test" ####### neeeds setting
+        part_default["project_name"] = "oomlout_oobb_organizing_pot_lid_bracket" ####### neeeds setting
         part_default["full_shift"] = [0, 0, 0]
         part_default["full_rotations"] = [0, 0, 0]
         
@@ -65,7 +65,7 @@ def get_base(thing, **kwargs):
 
     depth = kwargs.get("thickness", 4)
     prepare_print = kwargs.get("prepare_print", False)
-
+    rot = kwargs.get("rot", [0, 0, 0])
     pos = kwargs.get("pos", [0, 0, 0])
     #pos = copy.deepcopy(pos)
     #pos[2] += -20
@@ -75,21 +75,65 @@ def get_base(thing, **kwargs):
     p3["type"] = "p"
     p3["shape"] = f"oobb_plate"    
     p3["depth"] = depth
+    p3["width"] = 1
+    p3["holes"] = True
     #p3["m"] = "#"
+    poss = []
     pos1 = copy.deepcopy(pos)         
-    p3["pos"] = pos1
+    pos11 = copy.deepcopy(pos1)
+    pos12 = copy.deepcopy(pos1)
+    pos12[0] += 2*15
+    poss.append(pos11)
+    poss.append(pos12)
+    p3["pos"] = poss
     oobb_base.append_full(thing,**p3)
-    #add holes
+
+    #add cross beam
+    p4 = copy.deepcopy(p3)
+    pos1 = copy.deepcopy(pos)
+    pos1[0] += 1*15
+    pos1[1] += -1*15
+    p4["pos"] = pos1
+    rot1 = copy.deepcopy(rot)
+    rot1[2] = 90
+    p4["rot"] = rot1
+    oobb_base.append_full(thing,**p4)
+
+    #add long one for screw extra
+    p4 = copy.deepcopy(p3)
+    p4["holes"] = False
+    hei = p4["height"]
+    p4["height"] = hei + 2
+    pos1 = copy.deepcopy(pos)
+    p4["pos"] = pos1
+    oobb_base.append_full(thing,**p4)
+    
+    #add countersunk screws
     p3 = copy.deepcopy(kwargs)
-    p3["type"] = "p"
-    p3["shape"] = f"oobb_holes"
-    p3["both_holes"] = True  
-    p3["depth"] = depth
-    p3["holes"] = "perimeter"
+    p3["type"] = "n"
+    p3["shape"] = f"oobb_screw_countersunk"
+    p3["m"] = "m3d5_screw_wood"
+    p3["clearance"] = "top"
+    dep = 14
+    p3["depth"] = dep
+    poss = []
+    pos1 = copy.deepcopy(pos)
+    pos1[0] += dep / 2 - 3 # 3 mm inset
+    pos1[2] += dep / 2
+    pos11 = copy.deepcopy(pos1)
+    pos11[1] += (int(hei/2) + 1) * 15
+    pos12 = copy.deepcopy(pos1)
+    pos12[1] += -(int(hei/2) + 1) * 15
+    poss.append(pos11)
+    poss.append(pos12)
+    p3["pos"] = poss
+    rot1 = copy.deepcopy(rot)
+    rot1[1] = 90
+    p3["rot"] = rot1
     #p3["m"] = "#"
-    pos1 = copy.deepcopy(pos)         
-    p3["pos"] = pos1
     oobb_base.append_full(thing,**p3)
+    
+
 
     if prepare_print:
         #put into a rotation object
