@@ -42,12 +42,25 @@ def make_scad(**kwargs):
         part_default["full_shift"] = [0, 0, 0]
         part_default["full_rotations"] = [0, 0, 0]
         
-        part = copy.deepcopy(part_default)
+        part = copy.deepcopy(part_default)        
         p3 = copy.deepcopy(kwargs)
+        p3["width"] = 4
+        p3["height"] = 3
         #p3["thickness"] = 6
         part["kwargs"] = p3
         part["name"] = "base"
         parts.append(part)
+
+        part = copy.deepcopy(part_default)        
+        p3 = copy.deepcopy(kwargs)
+        p3["width"] = 4
+        p3["height"] = 7
+        #p3["thickness"] = 6
+        part["kwargs"] = p3
+        part["name"] = "base"
+        parts.append(part)
+
+
 
         
     #make the parts
@@ -78,17 +91,17 @@ def get_base(thing, **kwargs):
     p3["shape"] = f"oobb_plate"    
     p3["depth"] = depth
     p3["width"] = 1
-    p3["holes"] = True
-    #p3["m"] = "#"
+    p3["holes"] = True    
     poss = []
     pos1 = copy.deepcopy(pos)       
     pos1[1] += (height-1) / 2 * 15
     pos11 = copy.deepcopy(pos1)
     pos12 = copy.deepcopy(pos1)
-    pos12[0] += (height)*15
+    pos12[0] += (width-1)*15
     poss.append(pos11)
     poss.append(pos12)
-    p3["pos"] = poss
+    p3["pos"] = poss    
+    p3["m"] = ""
     oobb_base.append_full(thing,**p3)
 
     #add cross beam
@@ -97,11 +110,11 @@ def get_base(thing, **kwargs):
     hei = p4["width"]
     p4["width"] = width
     p4["height"] = 1
-
     pos1[0] += (width-1) / 2 * 15
     pos1[1] += 0
     p4["pos"] = pos1
     rot1 = copy.deepcopy(rot)
+    p4["m"] = ""
     oobb_base.append_full(thing,**p4)
 
     #add long one for screw extra
@@ -110,8 +123,9 @@ def get_base(thing, **kwargs):
     hei = p4["height"]
     p4["height"] = hei + 2
     pos1 = copy.deepcopy(pos)
-    pos1[1] += (height - 2) * 15
+    pos1[1] += height /2 * 15 + 15/2 - 15
     p4["pos"] = pos1
+    p4["m"] = ""
     oobb_base.append_full(thing,**p4)
     
     #add countersunk screws
@@ -136,7 +150,7 @@ def get_base(thing, **kwargs):
     rot1 = copy.deepcopy(rot)
     rot1[1] = 90
     p3["rot"] = rot1
-    #p3["m"] = "#"
+    p3["m"] = ""
     oobb_base.append_full(thing,**p3)
     
 
